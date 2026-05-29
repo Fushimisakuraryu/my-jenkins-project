@@ -20,6 +20,8 @@ spec:
       value: "localhost,127.0.0.1,10.0.0.0/8,192.168.0.0/16,.svc.cluster.local"
     - name: no_proxy
       value: "localhost,127.0.0.1,10.0.0.0/8,192.168.0.0/16,.svc.cluster.local"
+    - name: GIT_SSL_NO_VERIFY
+      value: "1"
     volumeMounts:
     - mountPath: /home/jenkins/agent
       name: workspace-volume
@@ -41,8 +43,6 @@ spec:
       value: "localhost,127.0.0.1,10.0.0.0/8,192.168.0.0/16,.svc.cluster.local"
     - name: no_proxy
       value: "localhost,127.0.0.1,10.0.0.0/8,192.168.0.0/16,.svc.cluster.local"
-    - name: JAVA_TOOL_OPTIONS
-      value: "-Dhttp.proxyHost=192.168.1.100 -Dhttp.proxyPort=8080 -Dhttps.proxyHost=192.168.1.100 -Dhttps.proxyPort=8080 -Dhttp.nonProxyHosts=localhost|127.0.0.1|10.*|192.168.*"
     volumeMounts:
     - mountPath: /home/jenkins/agent
       name: workspace-volume
@@ -54,18 +54,6 @@ spec:
     }
 
     stages {
-        stage('拉取代码') {
-            steps {
-                container('jnlp') {
-                    checkout([
-                        $class: 'GitSCM',
-                        branches: [[name: '*/master']],
-                        userRemoteConfigs: [[url: 'https://github.com/Fushimisakuraryu/my-jenkins-project']]
-                    ])
-                }
-            }
-        }
-
         stage('配置 Maven 代理') {
             steps {
                 container('maven') {
