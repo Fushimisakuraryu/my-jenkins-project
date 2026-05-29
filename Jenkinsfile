@@ -41,7 +41,7 @@ spec:
       value: "localhost,127.0.0.1,10.0.0.0/8,192.168.0.0/16,.svc.cluster.local"
     - name: no_proxy
       value: "localhost,127.0.0.1,10.0.0.0/8,192.168.0.0/16,.svc.cluster.local"
-    - name: MAVEN_OPTS
+    - name: JAVA_TOOL_OPTIONS
       value: "-Dhttp.proxyHost=192.168.1.100 -Dhttp.proxyPort=8080 -Dhttps.proxyHost=192.168.1.100 -Dhttps.proxyPort=8080 -Dhttp.nonProxyHosts=localhost|127.0.0.1|10.*|192.168.*"
     volumeMounts:
     - mountPath: /home/jenkins/agent
@@ -66,18 +66,35 @@ spec:
             }
         }
 
-        stage('网络诊断') {
+        stage('配置 Maven 代理') {
             steps {
                 container('maven') {
-                    sh 'echo "=== 1. 测试能否连代理 ==="'
-                    sh 'wget -q -O- --timeout=5 http://192.168.1.100:8080 || echo "代理不可达"'
-                    sh 'echo "=== 2. 测试直接连 Maven Central ==="'
-                    sh 'wget -q -O- --timeout=5 https://repo.maven.apache.org/maven2/ || echo "Maven Central 不可达"'
-                    sh 'echo "=== 3. 测试通过代理连 Maven Central ==="'
-                    sh 'export http_proxy=http://192.168.1.100:8080 https_proxy=http://192.168.1.100:8080 && wget -q -O- --timeout=10 https://repo.maven.apache.org/maven2/ || echo "代理连 Maven Central 失败"'
-                    sh 'echo "=== 4. java proxy settings ==="'
-                    sh 'java -XshowSettings:properties -version 2>&1 | grep -i proxy || true'
-                    sh 'echo "=== 诊断结束 ==="'
+                    sh '''
+mkdir -p /root/.m2
+cat > /root/.m2/settings.xml << 'EOF'
+<settings>
+  <proxies>
+    <proxy>
+      <id>genproxy</id>
+      <active>true</active>
+      <protocol>http</protocol>
+      <host>192.168.1.100</host>
+      <port>8080</port>
+      <nonProxyHosts>localhost|127.0.0.1|10.*|192.168.*</nonProxyHosts>
+    </proxy>
+    <proxy>
+      <id>genproxy-https</id>
+      <active>true</active>
+      <protocol>https</protocol>
+      <host>192.168.1.100</host>
+      <port>8080</port>
+      <nonProxyHosts>localhost|127.0.0.1|10.*|192.168.*</nonProxyHosts>
+    </proxy>
+  </proxies>
+</settings>
+EOF
+echo "settings.xml created"
+'''
                 }
             }
         }
