@@ -47,9 +47,11 @@ spec:
     - mountPath: /home/jenkins/agent
       name: workspace-volume
   - name: kaniko
-    image: gcr.io/kaniko-project/executor:latest
+    image: gcr.io/kaniko-project/executor:debug
     command:
-    - cat
+    - /busybox/sh
+    - -c
+    - sleep 99999
     tty: true
     env:
     - name: HTTP_PROXY
