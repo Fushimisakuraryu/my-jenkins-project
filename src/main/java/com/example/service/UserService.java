@@ -1,5 +1,6 @@
 package com.example.service;
 
+import com.example.exception.UserNotFoundException;
 import com.example.model.User;
 import com.example.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -21,7 +22,7 @@ public class UserService {
 
     public User findById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found: " + id));
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 
     public User findByEmail(String email) {
@@ -49,7 +50,7 @@ public class UserService {
 
     public void delete(Long id) {
         if (!userRepository.existsById(id)) {
-            throw new RuntimeException("User not found: " + id);
+            throw new UserNotFoundException(id);
         }
         userRepository.deleteById(id);
     }
