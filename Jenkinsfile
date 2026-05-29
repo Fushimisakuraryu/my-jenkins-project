@@ -46,6 +46,27 @@ spec:
     volumeMounts:
     - mountPath: /home/jenkins/agent
       name: workspace-volume
+  - name: kaniko
+    image: gcr.io/kaniko-project/executor:latest
+    command:
+    - cat
+    tty: true
+    env:
+    - name: HTTP_PROXY
+      value: "http://192.168.1.100:8080"
+    - name: HTTPS_PROXY
+      value: "http://192.168.1.100:8080"
+    - name: http_proxy
+      value: "http://192.168.1.100:8080"
+    - name: https_proxy
+      value: "http://192.168.1.100:8080"
+    - name: NO_PROXY
+      value: "localhost,127.0.0.1,10.0.0.0/8,192.168.0.0/16,.svc.cluster.local"
+    - name: no_proxy
+      value: "localhost,127.0.0.1,10.0.0.0/8,192.168.0.0/16,.svc.cluster.local"
+    volumeMounts:
+    - mountPath: /home/jenkins/agent
+      name: workspace-volume
   volumes:
   - name: workspace-volume
     emptyDir: {}
@@ -104,6 +125,21 @@ echo "settings.xml created"
             steps {
                 container('maven') {
                     sh 'mvn package -DskipTests'
+                }
+            }
+        }
+
+        stage('构建 Docker 镜像') {
+            steps {
+                container('kaniko') {
+                    sh '''
+/kaniko/executor \
+  --context=/home/jenkins/agent/workspace/my-first-gitops \
+  --dockerfile=Dockerfile \
+  --destination=fanglaoye/my-jenkins-project:v$BUILD_NUMBER \
+  --skip-tls-verify \
+  --cache=false
+'''
                 }
             }
         }
