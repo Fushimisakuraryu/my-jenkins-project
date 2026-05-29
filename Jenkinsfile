@@ -90,7 +90,7 @@ echo "settings.xml created"
         stage('构建与测试') {
             steps {
                 container('maven') {
-                    sh 'mvn clean test'
+                    sh 'mvn clean test -e'
                 }
             }
             post {
