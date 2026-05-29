@@ -7,6 +7,19 @@ spec:
   - name: jnlp
     image: fanglaoye/jenkins-custom-agent:v1
     imagePullPolicy: Always
+    env:
+    - name: HTTP_PROXY
+      value: "http://192.168.1.100:8080"
+    - name: HTTPS_PROXY
+      value: "http://192.168.1.100:8080"
+    - name: http_proxy
+      value: "http://192.168.1.100:8080"
+    - name: https_proxy
+      value: "http://192.168.1.100:8080"
+    - name: NO_PROXY
+      value: "localhost,127.0.0.1,10.0.0.0/8,192.168.0.0/16,.svc.cluster.local"
+    - name: no_proxy
+      value: "localhost,127.0.0.1,10.0.0.0/8,192.168.0.0/16,.svc.cluster.local"
     volumeMounts:
     - mountPath: /home/jenkins/agent
       name: workspace-volume
@@ -15,6 +28,21 @@ spec:
     command:
     - cat
     tty: true
+    env:
+    - name: HTTP_PROXY
+      value: "http://192.168.1.100:8080"
+    - name: HTTPS_PROXY
+      value: "http://192.168.1.100:8080"
+    - name: http_proxy
+      value: "http://192.168.1.100:8080"
+    - name: https_proxy
+      value: "http://192.168.1.100:8080"
+    - name: NO_PROXY
+      value: "localhost,127.0.0.1,10.0.0.0/8,192.168.0.0/16,.svc.cluster.local"
+    - name: no_proxy
+      value: "localhost,127.0.0.1,10.0.0.0/8,192.168.0.0/16,.svc.cluster.local"
+    - name: MAVEN_OPTS
+      value: "-Dhttp.proxyHost=192.168.1.100 -Dhttp.proxyPort=8080 -Dhttps.proxyHost=192.168.1.100 -Dhttps.proxyPort=8080"
     volumeMounts:
     - mountPath: /home/jenkins/agent
       name: workspace-volume
