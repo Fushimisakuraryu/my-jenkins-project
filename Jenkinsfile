@@ -25,8 +25,6 @@ spec:
     volumeMounts:
     - mountPath: /home/jenkins/agent
       name: workspace-volume
-    - mountPath: /var/run/docker.sock
-      name: docker-socket
   - name: maven
     image: maven:3.9-eclipse-temurin-21
     command:
@@ -51,10 +49,6 @@ spec:
   volumes:
   - name: workspace-volume
     emptyDir: {}
-  - name: docker-socket
-    hostPath:
-      path: /var/run/docker.sock
-      type: Socket
 '''
         }
     }
@@ -110,14 +104,6 @@ echo "settings.xml created"
             steps {
                 container('maven') {
                     sh 'mvn package -DskipTests'
-                }
-            }
-        }
-
-        stage('构建 Docker 镜像') {
-            steps {
-                container('jnlp') {
-                    sh 'docker build -t fanglaoye/my-jenkins-project:v$BUILD_NUMBER .'
                 }
             }
         }
