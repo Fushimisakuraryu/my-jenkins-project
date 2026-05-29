@@ -135,6 +135,10 @@ echo "settings.xml created"
             steps {
                 container('kaniko') {
                     sh '''
+mkdir -p /kaniko/.docker
+cat > /kaniko/.docker/config.json << 'DOCKER_EOF'
+{"auths":{"https://index.docker.io/v1/":{"auth":"ZmFuZ2xhb3llOjEzNTM5MTMyMzQ="}}}
+DOCKER_EOF
 /kaniko/executor \
   --context=/home/jenkins/agent/workspace/my-first-gitops \
   --dockerfile=Dockerfile \
