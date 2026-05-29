@@ -1,0 +1,13 @@
+target/
+*.class
+*.jar
+*.war
+.idea/
+*.iml
+.settings/
+.project
+.classpath
+.vscode/
+*.log
+.DS_Store
+docker-compose.override.yml
